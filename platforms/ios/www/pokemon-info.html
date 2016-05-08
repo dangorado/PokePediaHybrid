@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <!-- Main opmaak stuff begint hier -->
+        <div class="app">
+            <div data-role="page" id="pokemonInfoPage">
+                <div data-role="header">
+                    <a href="#" data-icon="back" data-rel="back" title="Go back">Back</a>
+                    <h1 id='pokemonInfoHeader'>loading...</h1>
+                    <!-- Insert ID en naam van pokémon hier -->
+                </div>
+                <div data-role="main" class="ui-content">
+                    <div id="infoPageRootContainer" data-role="container" class="ui-content">
+
+                        <div id='pokemonInfoPageLinkButton'>
+                            <a href="pokemon-info.html" class="ui-btn" data-rel="external" onclick=currentInfoScreen.openOfficialPokedex()>Open Official Page</a>
+                        </div>
+
+                        <!-- de pokemon's sprite en types -->
+                        <div class="ui-grid-a">
+                            <div class="ui-block-a"> 
+                                <div id='infoPageSprite'><!-- Insert Sprite Image here --></div>
+                            </div>
+                            <div class="ui-block-b">
+                                <div class="ui-corner-all custom-corners">
+                                    <div class="ui-bar ui-bar-a">
+                                        <h3>Type(s):</h3> 
+                                    </div>
+                                    <div class="ui-body ui-body-a">
+                                        <p id='infoPageTypes'><!-- Insert Types here --></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- id, height en weight -->
+                        <div class="ui-grid-b">
+                            <div class="ui-block-a"> 
+                                <div class="ui-corner-all custom-corners">
+                                    <div class="ui-bar ui-bar-a"><h3>ID:</h3></div>
+                                    <div class="ui-bar ui-body-a"><p id='infoPageID'><!-- Insert ID here --></p></div>
+                                </div>
+                            </div>
+                            <div class="ui-block-b"> 
+                                <div class="ui-corner-all custom-corners">
+                                    <div class="ui-bar ui-bar-a"><h3>Ht:</h3></div>
+                                    <div class="ui-bar ui-body-a"><p id='infoPageHeight'><!-- Insert Height here --></p></div>
+                                </div>
+                            </div>
+                            <div class="ui-block-c">
+                                <div class="ui-corner-all custom-corners">
+                                    <div class="ui-bar ui-bar-a"><h3>Wt:</h3></div>
+                                    <div class="ui-bar ui-body-a"><p id='infoPageWeight'><!-- Insert Weight here --></p></div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- De stats -->
+                        <div class="ui-grid-b">
+                            <div class="ui-block-a">
+                                <div class="ui-corner-all custom-corners">
+                                    <div class="ui-bar ui-bar-a"><h3>HP:</h3></div>
+                                    <div class="ui-bar ui-body-a"><p id='infoPageHP'><!-- Insert HP here --></p></div>
+                                </div>
+                            </div>
+                            <div class="ui-block-b"> 
+                                <div class="ui-corner-all custom-corners">
+                                    <div class="ui-bar ui-bar-a"><h3>Atk:</h3></div>
+                                    <div class="ui-bar ui-body-a"><p id='infoPageAtk'><!-- Insert Atk here --></p></div>
+                                </div>
+                            </div>
+                            <div class="ui-block-c"> 
+                                <div class="ui-corner-all custom-corners">
+                                    <div class="ui-bar ui-bar-a"><h3>Def:</h3></div>
+                                    <div class="ui-bar ui-body-a"><p id='infoPageDef'><!-- Insert Def here --></p></div>
+                                </div>
+                            </div>
+                            <div class="ui-block-a">
+                                <div class="ui-corner-all custom-corners">
+                                    <div class="ui-bar ui-bar-a"><h3>SpAtk:</h3></div>
+                                    <div class="ui-bar ui-body-a"><p id='infoPageSpAtk'><!-- Insert SpAtk here --></p></div>
+                                </div>
+                            </div>
+                            <div class="ui-block-b"> 
+                                <div class="ui-corner-all custom-corners">
+                                    <div class="ui-bar ui-bar-a"><h3>SpDef:</h3></div>
+                                    <div class="ui-bar ui-body-a"><p id='infoPageSpDef'><!-- Insert SpDef here --></p></div>
+                                </div>
+                            </div>
+                            <div class="ui-block-c"> 
+                                <div class="ui-corner-all custom-corners">
+                                    <div class="ui-bar ui-bar-a"><h3>Spd:</h3></div>
+                                    <div class="ui-bar ui-body-a"><p id='infoPageSpd'><!-- Insert Spd here --></p></div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Descriptions: -->
+                        <div class="ui-corner-all custom-corners">
+                            <div class="ui-bar ui-bar-a">
+                                <h3>Descriptions:</h3> 
+                            </div>
+                            <div class="ui-body ui-body-a">
+                                <div id='infoPageDescription'><!-- Insert description here --></div>
+                            </div>
+                        </div>
+
+                    </div>                    
+                </div>
+
+            </div>
+        </div>
+        <!-- Einde van de app opmaak -->
+    </body>
+</html>

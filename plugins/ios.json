@@ -1,0 +1,24 @@
+{
+    "prepare_queue": {
+        "installed": [],
+        "uninstalled": []
+    },
+    "config_munge": {
+        "files": {}
+    },
+    "installed_plugins": {
+        "cordova-plugin-geolocation": {
+            "PACKAGE_NAME": "com.avans.thanhdang"
+        },
+        "cordova-plugin-globalization": {
+            "PACKAGE_NAME": "com.avans.thanhdang"
+        },
+        "cordova-plugin-splashscreen": {
+            "PACKAGE_NAME": "com.avans.thanhdang"
+        },
+        "cordova-plugin-dialogs": {
+            "PACKAGE_NAME": "com.avans.thanhdang"
+        }
+    },
+    "dependent_plugins": {}
+}
