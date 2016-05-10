@@ -3,7 +3,7 @@
     <Identity Name="com.avans.thanhdang" Publisher="CN=$username$" Version="1.0.0.0" />
     <Properties>
         <DisplayName>PokePediaHybrid</DisplayName>
-        <PublisherDisplayName>PhoneGap Team</PublisherDisplayName>
+        <PublisherDisplayName>Thanh's Avans Email</PublisherDisplayName>
         <Logo>images\StoreLogo.png</Logo>
     </Properties>
     <Prerequisites>

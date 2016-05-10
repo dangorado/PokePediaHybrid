@@ -4,7 +4,7 @@
     <mp:PhoneIdentity PhoneProductId="2d325d00-0baa-11e6-a026-dbe832c910c0" PhonePublisherId="db093ed5-53b1-45f7-af72-751e8f36ab80" />
     <Properties>
         <DisplayName>PokePediaHybrid</DisplayName>
-        <PublisherDisplayName>PhoneGap Team</PublisherDisplayName>
+        <PublisherDisplayName>Thanh's Avans Email</PublisherDisplayName>
         <Logo>images\StoreLogo.png</Logo>
     </Properties>
     <Prerequisites>

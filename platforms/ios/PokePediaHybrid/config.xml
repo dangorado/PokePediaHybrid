@@ -29,8 +29,8 @@
         <param name="ios-package" value="CDVNotification" />
     </feature>
     <name>PokePediaHybrid</name>
-    <description>Hello World sample application that responds to the deviceready event.</description>
-    <author email="support@phonegap.com" href="http://phonegap.com">PhoneGap Team</author>
+    <description>MBD1 Project van Thanh Dang</description>
+    <author email="qtdang@avans.nl" href="">Thanh's Avans Email</author>
     <content src="index.html" />
     <icon src="icon.png" />
     <access origin="*" />

@@ -3,8 +3,8 @@
     <preference name="SplashScreenWidth" value="480" />
     <preference name="SplashScreenHeight" value="800" />
     <name>PokePediaHybrid</name>
-    <description>Hello World sample application that responds to the deviceready event.</description>
-    <author email="support@phonegap.com" href="http://phonegap.com">PhoneGap Team</author>
+    <description>MBD1 Project van Thanh Dang</description>
+    <author email="qtdang@avans.nl" href="">Thanh's Avans Email</author>
     <content src="index.html" />
     <preference name="DisallowOverscroll" value="true" />
     <preference name="android-minSdkVersion" value="14" />
