@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <!-- Main opmaak stuff begint hier -->
+        <div class="app">
+            <div data-url="pokemonSearchScreenPage" data-role="page" id="pokemonSearchScreenPage">
+                <div data-role="header">
+                    <a href="#" data-icon="back" data-rel="back">Back</a>
+                    <h1 id="pokemonSearchHeaderLabel">Searching...</h1>
+                </div>
+                <div role="main" class="ui-content" id="pokemonSearchMapCanvas">
+                    <!-- Hier wordt de map getekend -->
+                </div>
+                <!-- De scripts inladen -->
+                <script type="text/javascript" src="js/view/PokemonWildMarker.js"></script>   
+                <script type="text/javascript" src="js/PokemonGeolocater.js"></script>   
+                <script type="text/javascript" src="js/view/SearchScreen.js"></script>   
+                <script type="text/javascript">
+                    currentSearchScreen = new SearchScreen();
+                </script>
+            </div>
+        </div>
+        <!-- Einde van de app opmaak -->
+    </body>
+</html>

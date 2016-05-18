@@ -6,23 +6,22 @@
             <div data-role="page" id="pokemonTeamPage">
                 <div data-role="header">
                     <a href="#" data-icon="back" data-rel="back" title="Go back">Back</a>
-                    <h1>Your Team</h1>
+                    <h1 id="pokemonTeamPageHeaderLabel">Your Team</h1>
                 </div>
                 <div data-role="main" class="ui-content">
                     <div id="pokemonTeamContainer" data-role="container" class="ui-content">
                         <div id='pokemonTeamScreenList'>
                             <ul data-role="listview" id="pokemonTeamList" data-theme="a">
                                 <!-- Fill with javascript here, example: -->
-                                <!-- <li><a href="" data-id="'0'"><img src="http://pokeapi.co/media/sprites/pokemon/1.png"/><h3>Bulbasaur</h3></a></li> -->
                             </ul>
                         </div>
                     </div>                    
                 </div>
                 <!-- De javascript code nu als laatste inladen. Als eerste een laad dialoog laten zien. 
                      Vanwege de manier waarop Phonegap werkt moet dit dus binnen de "page" div, want anders negeert Phonegap de boel. -->
-                <script type="text/javascript" src="js/PokemonTeamScreen.js"></script>   
+                <script type="text/javascript" src="js/view/PokemonTeamScreen.js"></script>   
                 <script type="text/javascript">
-                    var pokemonTeamScreen = new PokemonTeamScreen();
+                    var currentTeamScreen = new PokemonTeamScreen();
                 </script>
             </div>
         </div>

@@ -1,7 +1,8 @@
-var PokemonEntry = function(realID, name) 
+var PokemonEntry = function(realID, name, detailsAddress) 
 {
 	this.iRealID = realID;
     this.strName = name;
+    this.pokemonDetailsAdress = detailsAddress;
     this.pokemonSpriteAddress = URL_GET_SPRITE + realID;
     this.pokemonDetails;
     this.pokemonDescriptions;
@@ -18,9 +19,9 @@ PokemonEntry.prototype.setDescriptions = function(descriptions)
 	this.pokemonDescriptions = descriptions;
 }
 
-PokemonEntry.prototype.setCaptureRate = function(rate)
+PokemonEntry.prototype.setCaptureRate = function(captureRate)
 {
-	this.pokemonCaptureRate = rate;
+	this.pokemonCaptureRate = captureRate;
 }
 
 PokemonEntry.prototype.getID = function()

@@ -30,5 +30,13 @@
         },
         "is_top_level": true,
         "variables": {}
+    },
+    "plugin.google.maps": {
+        "source": {
+            "type": "local",
+            "path": "plugins\\plugin.google.maps"
+        },
+        "is_top_level": true,
+        "variables": {}
     }
 }
