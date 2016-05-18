@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <!-- Main opmaak stuff begint hier -->
+        <div class="app">
+            <div data-role="page" id="settingsPage">
+                <div data-role="header">
+                    <a href="#" data-icon="back" data-rel="back" title="Go back">Back</a>
+                    <h1>Settings</h1>
+                </div>
+
+                <div data-role="main" class="ui-content">
+                    <div id="languageContainer" data-role="container" class="ui-content">
+
+                        <div id='languageButtons'>
+                            <fieldset data-role="controlgroup" id="settingsPageSelectedLanguage">
+                                <legend><h3>Flavor Text Language:</3></legend>
+                                <input name="radio-choice-v-2" id="radiolanguage-en" value="en" checked="checked" type="radio">
+                                <label for="radiolanguage-en">English</label>
+                                <input name="radio-choice-v-2" id="radiolanguage-ja" value="ja" type="radio">
+                                <label for="radiolanguage-ja">Japanese</label>
+                                <input name="radio-choice-v-2" id="radiolanguage-fr" value="fr" type="radio">
+                                <label for="radiolanguage-fr">French</label>
+                                <input name="radio-choice-v-2" id="radiolanguage-de" value="de" type="radio">
+                                <label for="radiolanguage-de">German</label>
+                            </fieldset>
+                        </div>
+
+                    </div>                    
+                </div>
+
+                <!-- Einde van de app opmaak -->
+                <script type="text/javascript" src="js/view/SettingsScreen.js"></script>
+                <script type="text/javascript">
+                    var settingsScreen = new SettingsScreen();
+                </script>
+
+            </div>
+        </div>
+    </body>
+</html>
