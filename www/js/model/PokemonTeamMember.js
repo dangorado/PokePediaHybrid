@@ -1,7 +1,8 @@
 // Kan potentieel ook moves, level en stat diversity toevoegen
-var PokemonTeamMember = function(entry, nickname) 
+var PokemonTeamMember = function(realID, pokemonName, nickname) 
 {
-	this.pokemonEntry = entry;
+	this.pokemonID = realID;
+	this.pokemonName = pokemonName;
 	this.pokemonNick;
 
 	if (nickname != null)
@@ -10,16 +11,21 @@ var PokemonTeamMember = function(entry, nickname)
 	}
 	else
 	{
-		this.pokemonNick = this.pokemonEntry.getName();
+		this.pokemonNick = this.pokemonName;
 	}
 }
 
-PokemonTeamMember.prototype.getPokemonEntry = function()
+PokemonTeamMember.prototype.getPokemonRealID = function()
 {
-	return this.pokemonEntry;
+	return this.pokemonID;
 }
 
 PokemonTeamMember.prototype.getNickname = function()
 {
 	return this.pokemonNick;
+}
+
+PokemonTeamMember.prototype.getPokemonName = function()
+{
+	return this.pokemonName;
 }

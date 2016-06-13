@@ -25,9 +25,9 @@ PokemonTeamScreen.prototype.updatePokemonTeamMembers = function()
 	    var pokemonTeamListHtml = ' ';
 	    for (var i = 0; i < pokemonTeam.length; i++) 
 	    {
-	        var realID = pokemonTeam[i].getPokemonEntry().getID();
+	        var realID = pokemonTeam[i].getPokemonRealID();
 	        var pokemonNick = pokemonTeam[i].getNickname();
-	        var pokemonName = pokemonTeam[i].getPokemonEntry().getName();
+	        var pokemonName = pokemonTeam[i].getPokemonName();
 	        // De list item opmaken met de link naar de pokedex detail scherm.
 	        pokemonTeamListHtml += '<li><a href="" data-transition="slide"><img src="' + URL_GET_SPRITE + realID + '.png"/><h3>' + pokemonNick + '</h3><p>' + pokemonName + '</p></a></li>';
 	    };

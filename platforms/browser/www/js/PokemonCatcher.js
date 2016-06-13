@@ -4,19 +4,31 @@ var INT_CATCHER_ESCAPE_THRESHOLD = 70, 	// Dit + de herberkende pokemon catch ra
 	INT_CATCHER_VARIANCE_MIN = 5,
 	INT_CATCHER_VARIANCE_MAX = 10,		// <-- Deze drie bepalen de variatie van de random nummer generator die hier gebruikt wordt.
 	INT_CATCHER_VARIANCE_STATIC = 5,
-	INT_CATCHER_BASE_BALL_COUNT = 3,	// <-- Basis hoeveelheid ballen/lokaas dat de speler krijgt.
+	INT_CATCHER_BASE_BALL_COUNT = 6,	// <-- Basis hoeveelheid ballen/lokaas dat de speler krijgt.
 	INT_CATCHER_BASE_BAIT_COUNT = 6,
-	INT_CATCHER_CATCH_RNG_MAX = 280;	// De maximum nummer dat de rng kan rollen bij het catchen van een pokemon. Hoe hoger dit getal, hoe lager de kans. 280 = ~90% kans als de poke een catchrate heeft van 255.
+	INT_CATCHER_CATCH_RNG_MAX = 260;	// De maximum nummer dat de rng kan rollen bij het catchen van een pokemon. Hoe hoger dit getal, hoe lager de kans. 280 = ~90% kans als de poke een catchrate heeft van 255.
 
 var pokemonCatcher;
 
 var PokemonCatcher = function() 
 {
+	this.isReady = false;
 	this.wildPokemon;
 	this.iCurrentCaptureRate;
 	this.iCurrentEscapeRate;
 	this.iBaitCount;
 	this.iBallCount;
+}
+
+PokemonCatcher.prototype.setWildPokemon = function(entry)
+{
+	this.wildPokemon = entry;
+	this.initialize();
+}
+
+PokemonCatcher.prototype.getWildPokemon = function()
+{
+	return this.wildPokemon;
 }
 
 // Accessors
@@ -31,15 +43,28 @@ PokemonCatcher.prototype.getBaitCount = function()
 }
 
 // Initialiseerd een nieuwe "catch session".
-PokemonCatcher.prototype.initialize = function(pokemonEntry)
+PokemonCatcher.prototype.preload = function(pokemonRarity)
 {
-	// NOTE: Iets doen voor als de pokemon's species data (en dus capture rate) nog niet ingeladen is.
-	this.wildPokemon = pokemonEntry;
-	this.iCurrentCaptureRate = pokemonEntry.getCaptureRate();
-	this.iCurrentEscapeRate = this.calculateBaseEscapeChance(this.iCurrentCaptureRate);
-	this.iBaitCount = INT_CATCHER_BASE_BAIT_COUNT;
-	this.iBallCount = INT_CATCHER_BASE_BALL_COUNT;
+	var self = this; 
+
+	self.wildPokemon = pokemonDatabase.getSpecificEntry(-1);
+
+	if (self.wildPokemon != null)
+	{
+		self.initialize();
+	}
 }
+
+PokemonCatcher.prototype.initialize = function()
+{
+	var self = this;
+	self.isReady = true;
+	self.iCurrentCaptureRate = self.wildPokemon.getCaptureRate();
+	self.iCurrentEscapeRate = self.calculateBaseEscapeChance(self.iCurrentCaptureRate);
+	self.iBaitCount = INT_CATCHER_BASE_BAIT_COUNT;
+	self.iBallCount = INT_CATCHER_BASE_BALL_COUNT;
+}
+
 
 PokemonCatcher.prototype.calculateBaseEscapeChance = function(captureRate)
 {
@@ -97,6 +122,8 @@ PokemonCatcher.prototype.throwPokeball = function()
 
 	var catchRN = Math.floor( ( Math.random() * INT_CATCHER_CATCH_RNG_MAX ) );
 
+	console.log('catch attempt roll: ' + catchRN + ' and min req: ' + this.iCurrentCaptureRate);
+
 	if (catchRN < this.iCurrentCaptureRate )
 	{
 		return true; // De pokémon is gevangen!
@@ -126,3 +153,9 @@ PokemonCatcher.prototype.pokemonCaught = function(nickname)
 {
 	pokemonDatabase.addPokemonTeamMember(this.wildPokemon, nickname);
 }
+
+wildEncounterEventListener.on('encounterEvent', function (event, rarity) 
+{
+	console.log('Pokemon found!');
+	currentSearchScreen.showWildEncounterPopup(rarity);
+});

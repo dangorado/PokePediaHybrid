@@ -3,6 +3,7 @@ var currentPokedexDetails;
 
 var Pokedex = function() 
 {
+    this.pokedexIsFetching = false;
     currentPokedex = this;
     currentPokedex.addEvents();
 };
@@ -11,15 +12,30 @@ Pokedex.prototype.addEvents = function(id)
 {
     // Listener op het scrollen toevoegen.
     $(document).on('scrollstop', currentPokedex.pokedexListScrollCheck);
-    // Listener toevoegen die activeert wanneer de pagina klaar is met laden.
-    $(document).on('pagebeforeshow', currentPokedex.initializePokedexPage );
     // Listener toevoegen om de laad indicator te laten zien.
     $(document).on('pagebeforeshow', currentPokedex.showLoadingIndicator );
+    // Listener toevoegen die activeert wanneer de pagina klaar is met laden.
+    $(document).on('pagebeforeshow', currentPokedex.initializePokedexPage );
+    
 };
 
 Pokedex.prototype.initializePokedexPage = function()
 {
-    currentPokedex.updatePokedexPage();
+    var activePage = $.mobile.pageContainer.pagecontainer("getActivePage");
+
+    // Eerst kijken of de gebruiker zich uberhaupt op de pokedex pagina bevindt.
+    if (activePage[0].id == "pokedexPage")
+    {
+        if (pokemonDatabase.getNumberOfEntries() == 0)
+        {
+            currentPokedex.pokedexAddEntries();
+        }
+        else
+        {
+            stopLoadingIndicator();
+            currentPokedex.addMissingEntries(activePage);
+        }
+    }
 };
 
 // Laat een loading indicator zien.
@@ -42,21 +58,26 @@ Pokedex.prototype.pokedexListScrollCheck = function()
     // Eerst kijken of de gebruiker zich uberhaupt op de pokedex pagina bevindt.
     if (activePage[0].id == "pokedexPage")
     {
-        // Hoogte van het scherm.
-        var screenHeight = $.mobile.getScreenHeight();
-        // De content div hoogte inclusief padding.
-        var contentHeight = $(".ui-content", activePage).outerHeight(),
-        // Hoogte van het gescrollde content.
-        scrolled = $(window).scrollTop(),
-        // Hoogte van de header. De -1 kan misschien overbodig zijn.
-        header = $(".ui-header", activePage).outerHeight() - 1,
-        // Kijken of het einde van de al geladen content bereikt is.
-        scrollEnd = contentHeight - screenHeight + header;
-        // Meer content inladen wanneer de bodem van de list bereikt is.
-        if (scrolled >= scrollEnd) 
+        if (!currentPokedex.isFetching)
         {
-            currentPokedex.pokedexAddEntries();
-        }  
+            // Hoogte van het scherm.
+            var screenHeight = $.mobile.getScreenHeight();
+            // De content div hoogte inclusief padding.
+            var contentHeight = $(".ui-content", activePage).outerHeight(),
+            // Hoogte van het gescrollde content.
+            scrolled = $(window).scrollTop(),
+            // Hoogte van de header. De -1 kan misschien overbodig zijn.
+            header = $(".ui-header", activePage).outerHeight() - 1,
+            // Kijken of het einde van de al geladen content bereikt is.
+            scrollEnd = contentHeight - screenHeight + header;
+            // Meer content inladen wanneer de bodem van de list bereikt is.
+            if (scrolled >= scrollEnd) 
+            {
+                // Er voor zorgen dat er niet meerdere keren tegelijk gefetched wordt.
+                currentPokedex.pokedexIsFetching = true;
+                currentPokedex.pokedexAddEntries();
+            }  
+        }
     }
 };
 
@@ -65,27 +86,22 @@ Pokedex.prototype.pokedexAddEntries = function()
     // Een laad dialog laten zien, om te laten weten dat er meer entries opgehaald worden.
     currentPokedex.showLoadingIndicator();
 
-    // De scrollstop event listener tijdelijk weghalen, anders blijft hij pokémon ophalen als de gebruiker blijft scrollen.
-    $(document).off("scrollstop");
-
     // NOTE: De entries hoeveelheid baseren op contentHeight later
     pokemonDatabase.fetchAdditionalEntries(20);
-
-    this.updatePokedexPage();
-
-    // Na het laden de event listener weer toepassen.
-    $(document).on("scrollstop", currentPokedex.pokedexListScrollCheck);
 };
 
 // Checked of de gebruiker zich op dit moment op de pokedex pagina bevindt. Zo ja, update dan de inhoud.
 Pokedex.prototype.updatePokedexPage = function()
 {
+    // Zowiezo instellen dat het fetchen klaar is.
+    currentPokedex.pokedexIsFetching = false;
+
     var currentPage = $.mobile.pageContainer.pagecontainer("getActivePage");
 
     // Eerst kijken of de gebruiker zich uberhaupt op de pokedex pagina bevindt.
     if (currentPage[0].id == "pokedexPage")
     {
-        this.addMissingEntries(currentPage);
+        currentPokedex.addMissingEntries(currentPage);
     }
 
     // De laad dialoog verbergen.
@@ -139,7 +155,7 @@ Pokedex.prototype.openPokemonInfoPage = function(pokemonRealID)
     if (descriptions == null)
     {
         console.log('Fetching descriptions...');
-        pokemonDatabase.fetchPokemonDescriptions(pokemonRealID);
+        pokemonDatabase.fetchPokemonSpeciesData(pokemonRealID);
     }
     else
     {
@@ -156,6 +172,7 @@ entryFetchListener.on('entriesReady', function (event, details)
 {
     if (currentPokedex != null)
     {
+        currentPokedex.pokedexIsFetching = false;
         currentPokedex.updatePokedexPage();
     }
 });

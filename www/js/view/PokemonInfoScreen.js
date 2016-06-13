@@ -127,14 +127,17 @@ PokemonInfoScreen.prototype.updateDescriptions = function()
 
 			// Opgeslagen taal ophalen.
 			var savedLanguage = localSettings.loadSetting('languageSetting');
-
-			if (savedLanguage != null)
+			
+			// Standaard op English zetten als er geen opgeslagen taal is.
+			if (savedLanguage == null)
 			{
-				// Checken of de taal overeenkomt.
-				if (selectedDesc.getLanguage() == savedLanguage)
-				{
-					currentInfoScreen.displayDescription(selectedDesc);
-				}
+				savedLanguage = 'en';
+			}
+
+			// Checken of de taal overeenkomt.
+			if (selectedDesc.getLanguage() == savedLanguage)
+			{
+				currentInfoScreen.displayDescription(selectedDesc);
 			}
 		}
 	}
@@ -143,13 +146,6 @@ PokemonInfoScreen.prototype.updateDescriptions = function()
 PokemonInfoScreen.prototype.displayDescription = function(description)
 {
 	$('#infoPageDescription').append( '<p><h3>' + description.getVersion() + ':</h3>' + description.getDescription() + '</p>' ).enhanceWithin();
-}
-
-// NOTE: DEBUG CODE - Dit wordt later via de map screen gedaan.
-PokemonInfoScreen.prototype.openCatchScreen = function()
-{
-	var pokemonEntry = pokemonDatabase.getPokemonEntry(this.pokemonID);
-	currentCaptureScreen = new PokemonCaptureScreen(pokemonEntry);
 }
 
 detailsFetchListener.on('detailsReady', function (event, details) 

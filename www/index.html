@@ -46,21 +46,41 @@
                     <div id="mainMenuContainer" data-role="container" class="ui-content">
                         <div data-role="main" class="ui-content">
                             <a href="pokemon-team-screen.html" class="ui-btn ui-corner-all ui-shadow" data-transition="slide">My Pokémon Team</a>
-                            <a href="pokemon-search-screen.html" class="ui-btn ui-corner-all ui-shadow" data-transition="slide">Search for Pokémon</a>
+                            <a href="#pokemonSearchScreenPage" class="ui-btn ui-corner-all ui-shadow" data-transition="slide" data-dom-cache="true">Search for Pokémon</a>
                             <a href="pokedex.html" class="ui-btn ui-corner-all ui-shadow" data-transition="slide">Pokédex</a>
                             <a href="settings.html" class="ui-btn ui-corner-all ui-shadow" data-transition="slide">Settings</a>
                         </div>
                     </div>                    
                 </div>
             </div>
+            <!-- Ik kreeg de google maps plugin niet fatsoenlijk werkende als ik deze pagina in een aparte HTML deed, dus vandaar dat ik hem maar als een subpage in de index html heb gezet -->
+            <!-- In een aparte html werkte de map steeds niet wanneer de pagina herladen werd (dus nadat er weg genavigeerd werd van de map pagina, en dan weer terug) -->
+            <div data-url="pokemonSearchScreenPage" data-role="page" id="pokemonSearchScreenPage">
+                <div data-role="header">
+                    <a href="#" data-icon="back" data-rel="back">Back</a>
+                    <h1 id="pokemonSearchHeaderLabel">PokéMap</h1>
+                </div>
+                <div role="main" class="ui-content" id="pokemonSearchMapCanvas"> <!-- Hier wordt de map getekend --></div>
+                <!-- Popups -->
+                <div data-role="popup" id="pokemonSearchEncounterPopup" data-overlay-theme="a" data-theme="a" data-dismissible="true">
+                    <div role="main" class="ui-content">
+                        <h3 id="pokemonSearchEncounterHeader"><!-- You've encountered Bulbasaur! --></h3>
+                        <div style="padding:10px 20px;">
+                            <p id="pokemonSearchEncounterQuestion"><!-- Attempt to catch it? --></p>
+                            <button id="pokemonSearchEncounterStartButton" onClick=currentSearchScreen.confirmWildEncounterPopup() type="submit" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-check" ><!-- ex: Yes! --></button>
+                            <button id="pokemonSearchEncounterCancelButton" onClick=currentSearchScreen.hideWildEncounterPopup() type="submit" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-check" ><!-- ex: No --></button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
         </div>
         <!-- Einde van de app opmaak -->
         <!-- Include the jQuery library -->
         <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
         <!-- Include the jQuery Mobile library -->
         <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
-        <!-- De Google Maps plugin -->
-        <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyD03lo7k170Iz2Eru7ucuoNt6CmuwwJq28"></script>
         <script type="text/javascript" src="cordova.js"></script>
         <script type="text/javascript" src="js/index.js"></script>
         <!-- De pokemonDatabase script inladen, inclusief de andere scripts die het nodig heeft. -->
@@ -73,6 +93,25 @@
         <script type="text/javascript" src="js/view/PokemonInfoScreen.js"></script> 
         <script type="text/javascript">
             app.initialize();
+        </script>
+        <!-- De map screen en de benodigdheden, zodat de Google Maps plugin ingeladen kan worden. -->
+        <script type="text/javascript" src="js/view/PokemonWildMarker.js"></script>   
+        <script type="text/javascript" src="js/PokemonGeolocater.js"></script>
+        <script type="text/javascript" src="js/view/PokemonCaptureScreen.js"></script>
+        <script type="text/javascript" src="js/PokemonCatcher.js"></script>  
+        <script type="text/javascript" src="js/view/SearchScreen.js"></script>  
+        <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyA-uppeJ23n6Zp5dV81ZqDPhAhwmN_5sg0"></script><!--  &callback=initMap"></script> <- voor als de script async wordt gebruikt -->
+        <script>
+            // De search screen initializen.
+            if (currentSearchScreen == null)
+            {
+                currentSearchScreen = new SearchScreen();
+            }
+            // De geolocater initializeren. 
+            if (currentGeolocater == null)
+            {
+                currentGeolocater = new PokemonGeolocater(document.getElementById("pokemonSearchMapCanvas"));
+            }
         </script>
     </body>
 </html>

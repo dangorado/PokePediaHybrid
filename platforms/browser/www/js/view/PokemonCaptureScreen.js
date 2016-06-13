@@ -9,14 +9,18 @@ var	STR_POKEMON_BUTTON_OK = "OK!",
 	STR_POKEMON_DISTRACT_EVENT = " is distracted!",
 	STR_POKEMON_ESCAPE_EVENT = " fled!",
 	STR_NO_POKEBALL_EVENT = "You have no pokéballs left!",
-	STR_NO_BAIT_EVENT = "You have no more bait!";
+	STR_NO_BAIT_EVENT = "You have no more bait!",
+	STR_LOADING = "...",
+	STR_FETCHING = "Fetching Pokémon...";
 
 var currentCaptureScreen;
 
-var PokemonCaptureScreen = function(wildPokemonEntry) 
+var PokemonCaptureScreen = function(pokemonRarity) 
 {
-	this.wildPokemon = wildPokemonEntry;
-	this.pokemonName = this.wildPokemon.getName();
+	this.isReady = false;
+	this.pokemonID;
+	this.pokemonName;
+	this.pokemonRarity = pokemonRarity;
 	this.initialize();
 }
 
@@ -29,30 +33,46 @@ PokemonCaptureScreen.prototype.initialize = function()
 	{
 		pokemonCatcher = new PokemonCatcher();
 	}
-
-	pokemonCatcher.initialize(this.wildPokemon);
+	pokemonCatcher.preload(this.pokemonRarity);
 
 	// Listener toevoegen die activeert wanneer de pagina klaar is met laden.
     $(document).on('pagebeforeshow', self.initializeCaptureScreen );
-    // Listener toevoegen om de laad indicator te laten zien.
-    // $(document).on('pagebeforeshow', self.showLoadingIndicator );
+    $(document).on('pageshow', self.showLoadingIndicator );
 }
 
 PokemonCaptureScreen.prototype.initializeCaptureScreen = function()
 {
+	var self = this;
 	var activePage = $.mobile.pageContainer.pagecontainer("getActivePage");
 
     // Eerst kijken of de gebruiker zich uberhaupt op de capture screen pagina bevindt.
     if (activePage[0].id == "capturePage")
     {
-    	var pokemonID = currentCaptureScreen.wildPokemon.getID();
-    	var pokemonName = currentCaptureScreen.wildPokemon.getName();
-    	// De pokémon's sprite laten zien.
-		$('#capturePokemonSprite').html('<img src="' + URL_GET_SPRITE + pokemonID + '.png"/>');
-		$('#capturePokemonName').html(pokemonName).enhanceWithin();
-		// Hoeveelheid balls en bait ook tonen.
-		currentCaptureScreen.updateCaptureScreen();
+    	if ( pokemonCatcher.isReady )
+    	{
+    		// End loading indicator here
+    		stopLoadingIndicator();
+    		self.isReady = true;
+    		
+    		var wildPokemon = pokemonCatcher.getWildPokemon();
+    		currentCaptureScreen.pokemonID = wildPokemon.getID();
+	    	currentCaptureScreen.pokemonName = wildPokemon.getName();
+	    	// De pokémon's sprite laten zien.
+			$('#capturePokemonSprite').html('<img src="' + URL_GET_SPRITE + currentCaptureScreen.pokemonID + '.png"/>');
+			$('#capturePokemonName').html(currentCaptureScreen.pokemonName).enhanceWithin();
+			// Hoeveelheid balls en bait ook tonen.
+			currentCaptureScreen.updateCaptureScreen();
+    	}
+    	else
+    	{
+    		self.isReady = false;
+
+    		// place holder sprite laten zien
+    		$('#capturePokemonSprite').html('<img src="' + URL_GET_SPRITE + 1 + '.png"/>');
+			$('#capturePokemonName').html( STR_LOADING ).enhanceWithin();
+    	}
     }
+
 }
 
 // Update de hoeveelheid bait/balls dat de speler over heeft.
@@ -68,7 +88,7 @@ PokemonCaptureScreen.prototype.updatePokeballPopup = function(success)
 	if (success)
 	{
 		// Alle strings goed zetten. Later dit via een taal setting/database doen.
-		$('#captureUsePokeballSuccess').html( STR_POKEMON_CAPTURED_EVENT + this.pokemonName + "!" );
+		$('#captureUsePokeballSuccess').html( STR_POKEMON_CAPTURED_EVENT + currentCaptureScreen.pokemonName + "!" );
 		$('#captureGiveNicknameHeader').html( STR_POKEMON_GIVE_NICKNAME );
 		$('#captureGiveNicknameLabel').html( STR_POKEMON_NICKNAME_FIELD );   
 		$('#captureGiveNicknameButton').html( STR_POKEMON_BUTTON_DONE );
@@ -76,7 +96,7 @@ PokemonCaptureScreen.prototype.updatePokeballPopup = function(success)
 	}
 	else
 	{
-		$('#captureUsePokeballFailed').html( STR_POKEMON_THE_PREFIX + this.pokemonName + STR_POKEMON_BROKE_FREE_EVENT );
+		$('#captureUsePokeballFailed').html( STR_POKEMON_THE_PREFIX + currentCaptureScreen.pokemonName + STR_POKEMON_BROKE_FREE_EVENT );
 		$('#capturePokeballFailedPopup').popup('open');
 	}
 }
@@ -85,11 +105,11 @@ PokemonCaptureScreen.prototype.updateItemThrowPopup = function(success)
 {
 	if ( success )
 	{
-		$('#captureThrowItemResult').html( STR_POKEMON_THE_PREFIX + this.pokemonName + STR_POKEMON_DISTRACT_EVENT );
+		$('#captureThrowItemResult').html( STR_POKEMON_THE_PREFIX + currentCaptureScreen.pokemonName + STR_POKEMON_DISTRACT_EVENT );
 	}
 	else
 	{
-		$('#captureThrowItemResult').html( STR_POKEMON_THE_PREFIX + this.pokemonName + STR_POKEMON_ANNOYED_EVENT );
+		$('#captureThrowItemResult').html( STR_POKEMON_THE_PREFIX + currentCaptureScreen.pokemonName + STR_POKEMON_ANNOYED_EVENT );
 	}
 }
 
@@ -97,7 +117,7 @@ PokemonCaptureScreen.prototype.noItemsLeftPopup = function(isPokeball)
 {
 	if ( isPokeball )
 	{
-		$('#captureNoItemsPopup').html( STR_POKEMON_THE_PREFIX + this.pokemonName + STR_POKEMON_ESCAPE_EVENT );
+		$('#captureNoItemsPopup').html( STR_POKEMON_THE_PREFIX + currentCaptureScreen.pokemonName + STR_POKEMON_ESCAPE_EVENT );
 		$('#captureNoItemsPopup').popup('open');
 	}
 }
@@ -106,7 +126,7 @@ PokemonCaptureScreen.prototype.pokemonFleeCheck = function()
 {
 	if ( pokemonCatcher.escapeCheck() )
 	{
-		$('#captureFleeResult').html( STR_POKEMON_THE_PREFIX + this.pokemonName + STR_POKEMON_ESCAPE_EVENT );
+		$('#captureFleeResult').html( STR_POKEMON_THE_PREFIX + currentCaptureScreen.pokemonName + STR_POKEMON_ESCAPE_EVENT );
 		$('#captureFleePopup').popup('open');
 	}
 	else
@@ -116,10 +136,15 @@ PokemonCaptureScreen.prototype.pokemonFleeCheck = function()
 	return true;
 }
 
-PokemonCaptureScreen.prototype.stopCaptureAttempt = function()
+// Een popup geldt als aparte history state, dus vandaar dat bij een geopende popup er 2 history states terug gegaan moeten worden.
+PokemonCaptureScreen.prototype.stopCaptureAttempt = function(isFromPopup)
 {
-	// De transition misschien later aanpassen.
-	$.mobile.changePage( "pokedex.html", { transition: "slideup", changeHash: false });
+	var toGoBack = -1;
+	if (isFromPopup)
+	{
+		toGoBack = -2;
+	}
+	window.history.go(toGoBack);
 }
 
 PokemonCaptureScreen.prototype.successfulCapture = function()
@@ -129,11 +154,17 @@ PokemonCaptureScreen.prototype.successfulCapture = function()
 	// Nu in de database de pokemon toevoegen aan de speler's team.
 	pokemonCatcher.pokemonCaught(chosenNick);
 
-	this.stopCaptureAttempt();
+	this.stopCaptureAttempt(true);
 }
 
 PokemonCaptureScreen.prototype.usePokeball = function()
 {
+	var self = this;
+	if (!self.isReady)
+	{
+		return;
+	}
+
 	// De speler heeft geen ballen over. Laat een popup zien.
 	if (pokemonCatcher.getBallCount() < 1)
 	{
@@ -159,6 +190,12 @@ PokemonCaptureScreen.prototype.usePokeball = function()
 
 PokemonCaptureScreen.prototype.throwBait = function()
 {
+	var self = this;
+	if (!self.isReady)
+	{
+		return;
+	}
+
 	// De speler heeft geen ballen over. Laat een popup zien.
 	if (pokemonCatcher.getBaitCount() < 1)
 	{
@@ -179,6 +216,12 @@ PokemonCaptureScreen.prototype.throwBait = function()
 
 PokemonCaptureScreen.prototype.throwRock = function()
 {
+	var self = this;
+	if (!self.isReady)
+	{
+		return;
+	}
+	
 	var annoyed = pokemonCatcher.throwItem(true);
 	this.updateCaptureScreen();
 
@@ -187,3 +230,26 @@ PokemonCaptureScreen.prototype.throwRock = function()
 		this.updateItemThrowPopup(annoyed);
 	}
 }
+
+PokemonCaptureScreen.prototype.closePopup = function(popupName)
+{
+	$('#' + popupName).popup('close');
+}
+
+// Laat een loading indicator zien als de details nog op null staan.
+PokemonCaptureScreen.prototype.showLoadingIndicator = function()
+{
+	var activePage = $.mobile.pageContainer.pagecontainer("getActivePage");
+
+	// Eerst kijken of de gebruiker zich uberhaupt op de pokedex pagina bevindt.
+    if (activePage[0].id == "capturePage")
+    {
+		startLoadingIndicator( STR_FETCHING );
+    }
+}
+
+specificEntryFetchListener.on('specificEntryReady', function (event, entry) 
+{
+	pokemonCatcher.setWildPokemon(entry);
+	currentCaptureScreen.initializeCaptureScreen();
+});

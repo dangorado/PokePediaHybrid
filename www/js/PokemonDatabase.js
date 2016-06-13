@@ -3,8 +3,8 @@ var URL_API_ADDRESS = "http://pokeapi.co/api/v2/",
 	URL_GET_SPRITE = "http://pokeapi.co/media/sprites/pokemon/",
 	URL_GET_DESCRIPTIONS = URL_API_ADDRESS + "pokemon-species/",
 	DEFAULT_POKEMON_COUNT = 151,
+    DEFAULT_POKEMON_MAX = 721, // Hierna komen er speciale varianten en mega pokemon, etc., die niet dezelfde opmaak volgen
     OFFICIAL_POKEDEX = "http://www.pokemon.com/us/pokedex/";
-var iPokemonCount = DEFAULT_POKEMON_COUNT; // Dit wordt later overschreven via een fetch van de JSON database.
 
 var PokemonDatabase = function() 
 {
@@ -15,6 +15,7 @@ var PokemonDatabase = function()
 PokemonDatabase.prototype.initialize = function()
 {
     this.retrieveLocalEntries();
+    this.retrieveLocalTeamMembers();
 
     if (this.pokemonEntries.length == 0)
     {
@@ -39,10 +40,96 @@ PokemonDatabase.prototype.saveLocalEntries = function()
     localSettings.saveSetting('pokemonEntries', localEntries);
 }
 
-// Accessor methode
 PokemonDatabase.prototype.getNumberOfEntries = function()
 {
 	return this.pokemonEntries.length;
+}
+
+PokemonDatabase.prototype.retrieveLocalTeamMembers = function()
+{
+    var localTeamMembers = localSettings.loadSetting('pokemonTeamMembers');
+    if (localTeamMembers != null)
+    {
+        console.log('Local team members loaded.');
+        this.parseLocalTeamMembers( JSON.parse(localTeamMembers) );
+    }
+}
+
+PokemonDatabase.prototype.saveLocalTeamMembers = function()
+{
+    var localMembers = JSON.stringify(this.pokemonTeam);
+    localSettings.saveSetting('pokemonTeamMembers', localMembers);
+}
+
+PokemonDatabase.prototype.getPokemonTeam = function()
+{
+    return this.pokemonTeam;
+}
+
+PokemonDatabase.prototype.addPokemonTeamMember = function(entry, nickname)
+{
+    var teamMember = new PokemonTeamMember(entry.getID(), entry.getName(), nickname);
+    this.pokemonTeam.push(teamMember);
+    this.saveLocalTeamMembers();
+}
+
+// Delete een specifieke team member uit de team member array.
+PokemonDatabase.prototype.releasePokemonTeamMember = function(index)
+{
+    this.pokemonTeam.splice(index, 1);
+}
+
+PokemonDatabase.prototype.getPokemonEntry = function(pokemonRealID)
+{
+    return this.pokemonEntries[pokemonRealID - 1];
+}
+
+// Retourneerd een entry's details. Als deze niet gedefineerd zijn retourneerd het NULL.
+PokemonDatabase.prototype.getPokemonDetails = function(pokemonRealID)
+{
+    var pokemonEntry = this.pokemonEntries[pokemonRealID - 1];
+
+    return pokemonEntry.getDetails();
+}
+
+// Retourneerd een pokemon entry uit de database, INCLUSIEF de flavor data. Als de data nog gefetched moet worden, dan retourneerd het NULL en begint het met fetchen.
+// Als -1 wordt gespecificeert als invoer dan retourneerd het een compleet random pokémon.
+PokemonDatabase.prototype.getSpecificEntry = function(pokemonRealID)
+{
+    var self = this;
+    var pokemonIDNumber;
+
+    if (pokemonRealID < 0)
+    {
+        pokemonIDNumber = Math.floor( ( Math.random() * ( DEFAULT_POKEMON_MAX - 1 ) ) ); 
+    }
+    else
+    {
+        pokemonIDNumber = pokemonRealID;
+    }
+
+    // Eerst kijken of het uberhaupt binnen de bestaande array valt.
+    if (pokemonIDNumber < self.pokemonEntries.length)
+    {
+        // Nu checken of de data compleet is.
+        if ( self.pokemonEntries[pokemonIDNumber].getCaptureRate() != null )
+        {
+            // Genoeg data beschikbaar, dus retourneer het meteen.
+            return self.pokemonEntries[pokemonIDNumber];
+        }
+        else
+        {
+            // Species data is niet compleet dus fetch het.
+            pokemonDatabase.fetchSpecificEntrySpecies( self.pokemonEntries[pokemonIDNumber] );
+        }
+    }
+    else 
+    {
+        pokemonDatabase.fetchSpecificEntry(pokemonIDNumber);
+    }
+
+    // Laten weten dat er gefetched moet worden via een null return.
+    return null;
 }
 
 // =======================================================================================================================
@@ -83,7 +170,6 @@ PokemonDatabase.prototype.parsePokemonDetailsJson = function(json, entry)
     // Elke stat in de stats array afgaan.
     $.each( json.stats, function(i, statRoot)
     {
-        // console.log(JSON.stringify(statRoot.base_stat));
         stats.push(statRoot.base_stat); // De stat toevoegen aan de stat array.
     });
     // De stat array toevoegen aan het details object.
@@ -223,46 +309,36 @@ PokemonDatabase.prototype.parseLocalDescriptions = function(json)
     return descriptions;
 }
 
+// De speler's gevangen pokemon ophalen.
+PokemonDatabase.prototype.parseLocalTeamMembers = function(json)
+{
+    // Voor de closures e.d.
+    var self = this;
+
+    // Elke pokemon in de json results afgaan.
+    $.each( json, function(i, poke)
+    {
+        var nickname = poke.pokemonNick;
+        var pokemonName = poke.pokemonName;
+        var pokemonID = poke.pokemonID;
+
+        var teamMember = new PokemonTeamMember(pokemonID, pokemonName, nickname );
+        self.pokemonTeam.push( teamMember );
+    });
+}
+
 // =======================================================================================================================
 // ============================================ Einde van de parsing methodes ============================================
 // =======================================================================================================================
 
-PokemonDatabase.prototype.getPokemonTeam = function()
-{
-    return this.pokemonTeam;
-}
-
-PokemonDatabase.prototype.addPokemonTeamMember = function(entry, nickname)
-{
-    var teamMember = new PokemonTeamMember(entry, nickname);
-    this.pokemonTeam.push(teamMember);
-}
-
-// Delete een specifieke team member uit de team member array.
-PokemonDatabase.prototype.releasePokemonTeamMember = function(index)
-{
-    this.pokemonTeam.splice(index, 1);
-}
-
-PokemonDatabase.prototype.getPokemonEntry = function(pokemonRealID)
-{
-    return this.pokemonEntries[pokemonRealID - 1];
-}
-
-// Retourneerd een entry's details. Als deze niet gedefineerd zijn retourneerd het NULL.
-PokemonDatabase.prototype.getPokemonDetails = function(pokemonRealID)
-{
-    var pokemonEntry = this.pokemonEntries[pokemonRealID - 1];
-
-    return pokemonEntry.getDetails();
-}
-
-// Fetched een hoeveelheid pokemon op van de JSON database. Ze worden op volgorde bovenop de bestaande entries array gezet.
-PokemonDatabase.prototype.fetchAdditionalEntries = function(amount)
+// Fetched een specifieke entry. Als de entries array niet groot genoeg is maakt deze methode de array groter.
+// Nadat de entry gefetched is, wordt het door gepasseerd aan de volgende methode
+PokemonDatabase.prototype.fetchSpecificEntry = function(arrayID)
 {
     var self = this;
-    var jsonAddress = URL_GET_POKEMON + '?limit=' + amount + '&offset=' + self.pokemonEntries.length;
-    console.log('Fetching with address: ' + jsonAddress);
+    
+    var additionalNeeded = ( arrayID - self.pokemonEntries.length + 1 );
+    var jsonAddress = URL_GET_POKEMON + '?limit=' + additionalNeeded + '&offset=' + self.pokemonEntries.length;
 
     var newEntries = [];
 
@@ -274,7 +350,81 @@ PokemonDatabase.prototype.fetchAdditionalEntries = function(amount)
         success: function (result) 
         {
             newEntries = self.parsePokemonEntryJson(result, self.pokemonEntries.length);
-            self.addAdditionalEntries(newEntries);
+            self.addAdditionalEntries(newEntries, false);
+            pokemonDatabase.saveLocalEntries();
+            
+            // Nu de entry die daadwerkelijk nodig is ophalen en dat dan doorpasseren.
+            var theEntry = self.pokemonEntries[ arrayID ];
+            pokemonDatabase.fetchSpecificEntrySpecies(theEntry);
+        },
+        error: function (request, error) 
+        {
+            alert('Could not connect to the PokeAPI!');
+        }
+    });
+}
+
+// Nadat een specifieke entry gefetched is, haal dan de entry's species data op en laat weten aan de listener wanneer dit klaar is.
+PokemonDatabase.prototype.fetchSpecificEntrySpecies = function(entry)
+{
+    var self = this; // Voor in de ajax call te gebruiken
+    var jsonDescAddress = URL_GET_DESCRIPTIONS + entry.getID();
+
+    $.ajax
+    ({
+        url: jsonDescAddress,
+        dataType: "json",
+        async: true,
+        success: function (result) 
+        {
+            var descriptions = self.parsePokemonDescriptionsJson(result, entry);
+            specificEntryFetchListener.notify(entry);
+        },
+        error: function (request, error) 
+        {
+            alert('Could not connect to the PokeAPI!');
+        }
+    });
+}
+
+// Fetched een hoeveelheid pokemon op van de JSON database. Ze worden op volgorde bovenop de bestaande entries array gezet.
+PokemonDatabase.prototype.fetchAdditionalEntries = function(amountToAdd)
+{
+    var self = this;
+
+    var amount = amountToAdd;
+
+    // Algorithme kan misschien niet kloppen bij de max
+    // console.log('if ( ' + self.pokemonEntries.length + ' + ' + amountToAdd + ' + 1 ) > ' + DEFAULT_POKEMON_MAX);
+
+    // Checken of er boven de maximale aantal pokemon aangevraagd wordt.
+    if ( (self.pokemonEntries.length + amountToAdd + 1) > DEFAULT_POKEMON_MAX )
+    {
+        amountToAdd = DEFAULT_POKEMON_MAX - self.pokemonEntries.length + amountToAdd + 1;
+    }
+
+    var newEntries = [];
+
+    // De maximum is bereikt.
+    if (amountToAdd < 1)
+    {
+        // Lege array terug sturen.
+        entryFetchListener.notify(newEntries);
+        return;
+    }
+
+    // Als bovenstaande niet het geval is, gewoon door gaan.
+    var jsonAddress = URL_GET_POKEMON + '?limit=' + amount + '&offset=' + self.pokemonEntries.length;
+
+    $.ajax
+    ({
+        url: jsonAddress,
+        dataType: "json",
+        async: true,
+        success: function (result) 
+        {
+            newEntries = self.parsePokemonEntryJson(result, self.pokemonEntries.length);
+            self.addAdditionalEntries(newEntries, true);
         },
         error: function (request, error) 
         {
@@ -284,7 +434,7 @@ PokemonDatabase.prototype.fetchAdditionalEntries = function(amount)
 }
 
 // Voegt de nieuwe entries toe aan de database en laat aan de listener weten dat de data klaar is voor gebruik.
-PokemonDatabase.prototype.addAdditionalEntries = function(newEntries)
+PokemonDatabase.prototype.addAdditionalEntries = function(newEntries, notifyListener)
 {
 	// Voor de closures e.d.
 	var self = this;
@@ -295,8 +445,11 @@ PokemonDatabase.prototype.addAdditionalEntries = function(newEntries)
         self.pokemonEntries.push( newEntries[i] );
     }
 
-    // Aan de listener doorgeven dat het klaar is met laden, en verder de nieuwe entries doorgeven.
-    entryFetchListener.notify(newEntries);
+    if (notifyListener)
+    {
+        // Aan de listener doorgeven dat het klaar is met laden, en verder de nieuwe entries doorgeven.
+        entryFetchListener.notify(newEntries);
+    }
 }
 
 // Retourneerd een hoeveelheid database entries gebaseerd op hoeveel er missen in de html pagina list.
@@ -323,7 +476,6 @@ PokemonDatabase.prototype.fetchPokemonDetails = function(pokemonRealID)
 {
 	var self = this; // Voor in de ajax call te gebruiken
 	var jsonDetailsAddress = URL_GET_POKEMON + pokemonRealID;
-	console.log('Fetching details with address: ' + jsonDetailsAddress);
 
     var pokemonEntry = this.pokemonEntries[pokemonRealID - 1];
 
@@ -344,12 +496,11 @@ PokemonDatabase.prototype.fetchPokemonDetails = function(pokemonRealID)
     });
 }
 
-// Fetched de pokemon descriptions asynchroon. Dit kan lang duren, dus laat een prompt zien.
-PokemonDatabase.prototype.fetchPokemonDescriptions = function(pokemonRealID)
+// Fetched de pokemon descriptions en catch rate asynchroon. Dit kan lang duren, dus laat een prompt zien.
+PokemonDatabase.prototype.fetchPokemonSpeciesData = function(pokemonRealID)
 {
     var self = this; // Voor in de ajax call te gebruiken
     var jsonDescAddress = URL_GET_DESCRIPTIONS + pokemonRealID;
-    console.log('Fetching flavor text with address: ' + jsonDescAddress);
 
     var pokemonEntry = this.pokemonEntries[pokemonRealID - 1];
 
@@ -410,7 +561,17 @@ var descriptionsFetchListener =
     }
 };
 
+var specificEntryFetchListener =
+{
+    notify: function (entry)
+    {
+        this.trigger('specificEntryReady', entry);
+        pokemonDatabase.saveLocalEntries();
+    }
+};
+
 // De listeners extenden.
 $.extend(entryFetchListener, eventInterface);
 $.extend(detailsFetchListener, eventInterface);
 $.extend(descriptionsFetchListener, eventInterface);
+$.extend(specificEntryFetchListener, eventInterface);

@@ -221,3 +221,9 @@ html .ui-alt-icon .ui-radio-off:after {
 	height: 100%; 
 	padding: 0; 
 }
+/* De div waarin de Google Maps API staat */
+#pokemonSearchMapCanvas {
+	margin: 0; 
+	padding: 0; 
+	height: 100%; 
+}

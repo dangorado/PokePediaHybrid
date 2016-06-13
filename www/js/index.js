@@ -17,6 +17,9 @@
  * under the License.
  */
 var pokemonDatabase;
+var pokemonMap;
+var currentSearchScreen;
+var currentGeolocater;
 
 var app = 
 {
@@ -103,3 +106,4 @@ var stopLoadingIndicator = function()
     // De laad dialoog verbergen.
     $.mobile.loading("hide", null);
 };
+

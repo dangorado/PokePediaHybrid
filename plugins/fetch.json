@@ -31,10 +31,10 @@
         "is_top_level": true,
         "variables": {}
     },
-    "plugin.google.maps": {
+    "cordova-plugin-vibration": {
         "source": {
-            "type": "local",
-            "path": "plugins\\plugin.google.maps"
+            "type": "registry",
+            "id": "cordova-plugin-vibration"
         },
         "is_top_level": true,
         "variables": {}

@@ -12,6 +12,15 @@ var PokemonWildMarker = function(lat, lng, rarity, map, icon)
     });
 }
 
+PokemonWildMarker.prototype.deleteMarker = function()
+{
+    if (this.marker != null)
+    {
+        this.marker.setMap(null);
+        this.marker = null;
+    }
+}
+
 PokemonWildMarker.prototype.getMarker = function()
 {
 	return this.marker;

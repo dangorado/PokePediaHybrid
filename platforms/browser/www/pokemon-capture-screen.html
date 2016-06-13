@@ -5,7 +5,7 @@
         <div class="app">
             <div data-role="page" id="capturePage">
                 <div data-role="header">
-                    <a href="#" data-icon="back" data-rel="back" id="btnBack">Run</a>
+                    <a href="#" data-icon="back" id="btnBack" onClick=currentCaptureScreen.stopCaptureAttempt(false) >Run</a>
                     <h1 id="captureHeaderLabel">Encounter!</h1>
                 </div>
                 <div data-role="main" class="ui-content">
@@ -45,7 +45,7 @@
                             <div data-role="popup" id="capturePokeballFailedPopup" data-overlay-theme="b" data-theme="b" data-dismissible="false">
                                 <div role="main" class="ui-content">
                                     <h3 id="captureUsePokeballFailed"><!-- ex: The Bulbasaur broke free! --></h3>
-                                    <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-rel="back">OK!</a>
+                                    <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" onclick=currentCaptureScreen.closePopup("capturePokeballFailedPopup") >OK!</a>
                                 </div>
                             </div>
 
@@ -66,21 +66,21 @@
                             <div data-role="popup" id="captureThrowItemPopup" data-overlay-theme="b" data-theme="b" data-dismissible="false">
                                 <div role="main" class="ui-content">
                                     <h3 id="captureThrowItemResult"><!-- ex: The Bulbasaur is distracted! --></h3>
-                                    <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-rel="back">OK!</a>
+                                    <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" onclick=currentCaptureScreen.closePopup("captureThrowItemPopup") >OK!</a>
                                 </div>
                             </div>
 
                             <div data-role="popup" id="captureFleePopup" data-overlay-theme="b" data-theme="b" data-dismissible="false">
                                 <div role="main" class="ui-content">
                                     <h3 id="captureFleeResult"><!-- ex: The Bulbasaur fled! --></h3>
-                                    <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" onclick=currentCaptureScreen.stopCaptureAttempt()>OK</a>
+                                    <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" onclick=currentCaptureScreen.stopCaptureAttempt(true)>OK</a>
                                 </div>
                             </div>
 
                             <div data-role="popup" id="captureNoItemsPopup" data-overlay-theme="b" data-theme="b" data-dismissible="false">
                                 <div role="main" class="ui-content">
                                     <h3 id="captureNoItemsResult"><!-- ex: You have no pokéballs left! --></h3>
-                                    <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-rel="back">OK</a>
+                                    <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" onclick=currentCaptureScreen.closePopup("captureNoItemsPopup") >OK</a>
                                 </div>
                             </div>
 
